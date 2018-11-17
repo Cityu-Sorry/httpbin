@@ -9,7 +9,7 @@ from httpbin.helpers import (
 import time
 
 
-def get_request_md5():
+def get_request_sha():
     url_byte = H(request.base_url.encode("utf-8"), algorithm='SHA-256')
     data_byte = H(request.data, algorithm='SHA-256')
     md5 = H((url_byte.__add__(data_byte)).encode("utf-8"), algorithm='SHA-256')
@@ -23,7 +23,7 @@ class TimeInterceptor:
         url = request.base_url
         if url.endswith('timecost'):
             return
-        md5 = get_request_md5()
+        md5 = get_request_sha()
         time_result = self.time_list[md5]
         time_result.end_ts = time.time()
         print(time_result.get_duration())
@@ -32,7 +32,7 @@ class TimeInterceptor:
         url = request.base_url
         if url.endswith('timecost'):
             return
-        md5 = get_request_md5()
+        md5 = get_request_sha()
         time_result = TimeResult(start_ts=time.time(), url=url)
         self.time_list[md5] = time_result
 

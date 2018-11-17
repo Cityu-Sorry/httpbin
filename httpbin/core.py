@@ -236,9 +236,9 @@ def set_cors_headers(response):
     return response
 
 
-// stop the time interceptor when errors occur
+# stop the time interceptor when errors occur
 @app.teardown_request 
-def handle_timeinterceptor():
+def handle_timeinterceptor(exception=None):
     interceptor.end_intercept()
 
 # ------
