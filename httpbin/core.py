@@ -26,6 +26,7 @@ from flask import (
     url_for,
     abort,
 )
+from httpbin.Interceptor import TimeInterceptor
 from six.moves import range as xrange
 from werkzeug.datastructures import WWWAuthenticate, MultiDict
 from werkzeug.http import http_date
@@ -89,6 +90,7 @@ app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
 app.add_template_global("HTTPBIN_TRACKING" in os.environ, name="tracking_enabled")
 
 app.config["SWAGGER"] = {"title": "httpbin.org", "uiversion": 3}
+interceptor = TimeInterceptor()
 
 template = {
     "swagger": "2.0",
@@ -199,6 +201,7 @@ empties the input request stream.
 
 @app.before_request
 def before_request():
+    interceptor.start_intercept()
     if request.environ.get("HTTP_TRANSFER_ENCODING", "").lower() == "chunked":
         server = request.environ.get("SERVER_SOFTWARE", "")
         if server.lower().startswith("gunicorn/"):
@@ -229,6 +232,7 @@ def set_cors_headers(response):
             response.headers["Access-Control-Allow-Headers"] = request.headers[
                 "Access-Control-Request-Headers"
             ]
+    interceptor.end_intercept()
     return response
 
 
@@ -1776,6 +1780,17 @@ def a_json_endpoint():
             ],
         }
     )
+
+
+@app.route('/timecost', methods=("GET",))
+def get_time_cost():
+    result = '{'
+    for key, value in interceptor.time_list.items():
+        result += '"cost":{"url":"%s", "time_cost":"%s"},'%(value.url, value.get_duration())
+    result = result[:-1]
+    result += '}'
+    print(result)
+    return Response(json.dumps(result),  mimetype='application/json')
 
 
 if __name__ == "__main__":
