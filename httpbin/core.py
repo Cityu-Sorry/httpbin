@@ -1803,7 +1803,7 @@ def get_time_cost():
     result=[]
     for value in interceptor.time_list.values():
         result.append('url=%s,  time_cost=%s' % (value.url, value.get_duration()))
-        result = result[4:]
+    result = result[4:]
     return jsonify(result)
 
 
