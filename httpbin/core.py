@@ -141,6 +141,7 @@ template = {
             "name": "Anything",
             "description": "Returns anything that is passed to request",
         },
+        {"name": "Time cost", "description": "Returns time cost of each request"},
     ],
 }
 
@@ -1789,13 +1790,20 @@ def a_json_endpoint():
 
 @app.route('/timecost', methods=("GET",))
 def get_time_cost():
-    result = '{'
-    for key, value in interceptor.time_list.items():
-        result += '"cost":{"url":"%s", "time_cost":"%s"},'%(value.url, value.get_duration())
-    result = result[:-1]
-    result += '}'
-    print(result)
-    return Response(json.dumps(result),  mimetype='application/json')
+    """Returns time cost for each request.
+    ---
+    tags:
+      - Time cost
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Time cost of each request.
+    """
+    result=[]
+    for value in interceptor.time_list.values():
+        result.append('url=%s,  time_cost=%s' % (value.url, value.get_duration()))
+    return jsonify(result)
 
 
 if __name__ == "__main__":
