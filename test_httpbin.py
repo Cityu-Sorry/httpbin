@@ -812,5 +812,11 @@ class HttpbinTestCase(unittest.TestCase):
         self.assertEqual(parse_multi_value_header('W/"xyzzy", W/"r2d2xxxx", W/"c3piozzzz"'), [ "xyzzy", "r2d2xxxx", "c3piozzzz" ])
         self.assertEqual(parse_multi_value_header('*'), [ "*" ])
 
+    def test_xml_content(self):
+        response = self.app.get(path='/get_xml')
+        self.assertEqual(
+            response.headers.get('Content-type'), 'application/xml'
+        )
+
 if __name__ == '__main__':
     unittest.main()
