@@ -14,12 +14,15 @@ import random
 import time
 import uuid
 import argparse
+import dicttoxml
+import xml.dom.minidom as xdm
 
 from flask import (
     Flask,
     Response,
     request,
     render_template,
+    render_template_string,
     redirect,
     jsonify as flask_jsonify,
     make_response,
@@ -383,10 +386,31 @@ def view_get():
       - application/json
     responses:
       200:
-        description: The request's query parameters.
+        description: The request's GET parameters.
     """
 
     return jsonify(get_dict("url", "args", "headers", "origin"))
+
+
+@app.route("/get_xml", methods=("GET",))
+def view_get_xml():
+    """The request's query parameters (in XML).
+    ---
+    tags:
+      - HTTP Methods
+    produces:
+      - application/xml
+    responses:
+      200:
+        description: The request's query parameters.
+    """
+    
+    xml_file = dicttoxml.dicttoxml(get_dict("url", "args", "headers", "origin"))
+    s = xdm.parseString(xml_file).toprettyxml()
+
+    response = make_response(render_template_string(s))
+    response.headers["Content-Type"] = "application/xml"
+    return response
 
 
 @app.route("/anything", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "TRACE"])
@@ -439,6 +463,27 @@ def view_post():
     )
 
 
+@app.route("/post_xml", methods=("POST",))
+def view_post_xml():
+    """The request's POST parameters (in XML).
+    ---
+    tags:
+      - HTTP Methods
+    produces:
+      - application/xml
+    responses:
+      200:
+        description: The request's POST parameters.
+    """
+    
+    xml_file = dicttoxml.dicttoxml(get_dict("url", "args", "form", "data", "origin", "headers", "files", "json"))
+    s = xdm.parseString(xml_file).toprettyxml()
+    
+    response = make_response(render_template_string(s))
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+
 @app.route("/put", methods=("PUT",))
 def view_put():
     """The request's PUT parameters.
@@ -455,6 +500,27 @@ def view_put():
     return jsonify(
         get_dict("url", "args", "form", "data", "origin", "headers", "files", "json")
     )
+
+
+@app.route("/put_xml", methods=("PUT",))
+def view_put_xml():
+    """The request's PUT parameters (in XML).
+    ---
+    tags:
+      - HTTP Methods
+    produces:
+      - application/xml
+    responses:
+      200:
+        description: The request's PUT parameters.
+    """
+    
+    xml_file = dicttoxml.dicttoxml(get_dict("url", "args", "form", "data", "origin", "headers", "files", "json"))
+    s = xdm.parseString(xml_file).toprettyxml()
+    
+    response = make_response(render_template_string(s))
+    response.headers["Content-Type"] = "application/xml"
+    return response
 
 
 @app.route("/patch", methods=("PATCH",))
@@ -475,6 +541,27 @@ def view_patch():
     )
 
 
+@app.route("/patch_xml", methods=("PATCH",))
+def view_patch_xml():
+    """The request's PATCH parameters (in XML).
+    ---
+    tags:
+      - HTTP Methods
+    produces:
+      - application/xml
+    responses:
+      200:
+        description: The request's PATCH parameters.
+    """
+    
+    xml_file = dicttoxml.dicttoxml(get_dict("url", "args", "form", "data", "origin", "headers", "files", "json"))
+    s = xdm.parseString(xml_file).toprettyxml()
+    
+    response = make_response(render_template_string(s))
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+
 @app.route("/delete", methods=("DELETE",))
 def view_delete():
     """The request's DELETE parameters.
@@ -491,6 +578,27 @@ def view_delete():
     return jsonify(
         get_dict("url", "args", "form", "data", "origin", "headers", "files", "json")
     )
+
+
+@app.route("/delete_xml", methods=("DELETE",))
+def view_delete_xml():
+    """The request's DELETE parameters (in XML).
+    ---
+    tags:
+      - HTTP Methods
+    produces:
+      - application/xml
+    responses:
+      200:
+        description: The request's DELETE parameters.
+    """
+    
+    xml_file = dicttoxml.dicttoxml(get_dict("url", "args", "form", "data", "origin", "headers", "files", "json"))
+    s = xdm.parseString(xml_file).toprettyxml()
+    
+    response = make_response(render_template_string(s))
+    response.headers["Content-Type"] = "application/xml"
+    return response
 
 
 @app.route("/gzip")
