@@ -386,7 +386,7 @@ def view_get():
       - application/json
     responses:
       200:
-        description: The request's GET parameters.
+        description: The request's query parameters.
     """
 
     return jsonify(get_dict("url", "args", "headers", "origin"))
