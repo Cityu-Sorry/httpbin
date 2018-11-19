@@ -14,15 +14,12 @@ import random
 import time
 import uuid
 import argparse
-import dicttoxml
-import xml.dom.minidom as xdm
 
 from flask import (
     Flask,
     Response,
     request,
     render_template,
-    render_template_string,
     redirect,
     jsonify as flask_jsonify,
     make_response,
@@ -42,6 +39,7 @@ from .helpers import (
     get_headers,
     status_code,
     get_dict,
+    get_xml,
     get_request_range,
     check_basic_auth,
     check_digest_auth,
@@ -405,12 +403,7 @@ def view_get_xml():
         description: The request's query parameters.
     """
     
-    xml_file = dicttoxml.dicttoxml(get_dict("url", "args", "headers", "origin"))
-    s = xdm.parseString(xml_file).toprettyxml()
-
-    response = make_response(render_template_string(s))
-    response.headers["Content-Type"] = "application/xml"
-    return response
+    return get_xml(get_dict("url", "args", "headers", "origin"))
 
 
 @app.route("/anything", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "TRACE"])
@@ -475,13 +468,8 @@ def view_post_xml():
       200:
         description: The request's POST parameters.
     """
-    
-    xml_file = dicttoxml.dicttoxml(get_dict("url", "args", "form", "data", "origin", "headers", "files", "json"))
-    s = xdm.parseString(xml_file).toprettyxml()
-    
-    response = make_response(render_template_string(s))
-    response.headers["Content-Type"] = "application/xml"
-    return response
+
+    return get_xml(get_dict("url", "args", "form", "data", "origin", "headers", "files", "json"))
 
 
 @app.route("/put", methods=("PUT",))
@@ -515,12 +503,7 @@ def view_put_xml():
         description: The request's PUT parameters.
     """
     
-    xml_file = dicttoxml.dicttoxml(get_dict("url", "args", "form", "data", "origin", "headers", "files", "json"))
-    s = xdm.parseString(xml_file).toprettyxml()
-    
-    response = make_response(render_template_string(s))
-    response.headers["Content-Type"] = "application/xml"
-    return response
+    return get_xml(get_dict("url", "args", "form", "data", "origin", "headers", "files", "json"))
 
 
 @app.route("/patch", methods=("PATCH",))
@@ -554,12 +537,7 @@ def view_patch_xml():
         description: The request's PATCH parameters.
     """
     
-    xml_file = dicttoxml.dicttoxml(get_dict("url", "args", "form", "data", "origin", "headers", "files", "json"))
-    s = xdm.parseString(xml_file).toprettyxml()
-    
-    response = make_response(render_template_string(s))
-    response.headers["Content-Type"] = "application/xml"
-    return response
+    return get_xml(get_dict("url", "args", "form", "data", "origin", "headers", "files", "json"))
 
 
 @app.route("/delete", methods=("DELETE",))
@@ -593,12 +571,7 @@ def view_delete_xml():
         description: The request's DELETE parameters.
     """
     
-    xml_file = dicttoxml.dicttoxml(get_dict("url", "args", "form", "data", "origin", "headers", "files", "json"))
-    s = xdm.parseString(xml_file).toprettyxml()
-    
-    response = make_response(render_template_string(s))
-    response.headers["Content-Type"] = "application/xml"
-    return response
+    return get_xml(get_dict("url", "args", "form", "data", "origin", "headers", "files", "json"))
 
 
 @app.route("/gzip")

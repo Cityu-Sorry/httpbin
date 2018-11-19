@@ -12,11 +12,14 @@ import base64
 import re
 import time
 import os
+import dicttoxml
+import xml.dom.minidom as xdm
+
 from hashlib import md5, sha256, sha512
 from werkzeug.http import parse_authorization_header
 from werkzeug.datastructures import WWWAuthenticate
 
-from flask import request, make_response
+from flask import request, make_response, render_template_string
 from six.moves.urllib.parse import urlparse, urlunparse
 
 
@@ -204,6 +207,15 @@ def get_dict(*keys, **extras):
 
     return out_d
 
+
+def get_xml(d):
+    """Returns XML format of dict."""
+    xml_file = dicttoxml.dicttoxml(d)
+    s = xdm.parseString(xml_file).toprettyxml()
+
+    response = make_response(render_template_string(s))
+    response.headers["Content-Type"] = "application/xml"
+    return response
 
 def status_code(code):
     """Returns response object of given status code."""
