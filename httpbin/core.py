@@ -34,8 +34,8 @@ from werkzeug.wrappers import BaseResponse
 from werkzeug.http import parse_authorization_header
 from flasgger import Swagger, NO_SANITIZER
 
-from . import filters
-from .helpers import (
+from httpbin import filters
+from httpbin.helpers import (
     get_headers,
     status_code,
     get_dict,
@@ -51,8 +51,8 @@ from .helpers import (
     next_stale_after_value,
     digest_challenge_response,
 )
-from .utils import weighted_choice
-from .structures import CaseInsensitiveDict
+from httpbin.utils import weighted_choice
+from httpbin.structures import CaseInsensitiveDict
 
 with open(
     os.path.join(os.path.realpath(os.path.dirname(__file__)), "VERSION")
@@ -203,7 +203,7 @@ empties the input request stream.
 
 @app.before_request
 def before_request():
-    interceptor.start_intercept()
+    interceptor.start_intercept(request)
     if request.environ.get("HTTP_TRANSFER_ENCODING", "").lower() == "chunked":
         server = request.environ.get("SERVER_SOFTWARE", "")
         if server.lower().startswith("gunicorn/"):
@@ -234,14 +234,14 @@ def set_cors_headers(response):
             response.headers["Access-Control-Allow-Headers"] = request.headers[
                 "Access-Control-Request-Headers"
             ]
-    interceptor.end_intercept()
+    interceptor.end_intercept(request)
     return response
 
 
 # stop the time interceptor when errors occur
 @app.teardown_request 
 def handle_timeinterceptor(exception=None):
-    interceptor.end_intercept()
+    interceptor.end_intercept(request)
 
 # ------
 # Routes
@@ -1884,7 +1884,6 @@ def get_time_cost():
     result=[]
     for value in interceptor.time_list.values():
         result.append('url=%s,  time_cost=%s' % (value.url, value.get_duration()))
-    result = result[4:]
     return jsonify(result)
 
 

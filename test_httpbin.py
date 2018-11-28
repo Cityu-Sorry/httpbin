@@ -9,6 +9,12 @@ import json
 from werkzeug.http import parse_dict_header
 from hashlib import md5, sha256, sha512
 from six import BytesIO
+from httpbin.Interceptor import get_request_sha
+import requests
+from flask import (
+    request, jsonify as flask_jsonify,
+)
+
 
 import httpbin
 from httpbin.helpers import parse_multi_value_header
@@ -29,6 +35,16 @@ def _setenv(key, value):
         os.environ.pop(key, None)
     else:
         os.environ[key] = value
+
+def test_get_request_sha():
+    SHA1 = get_request_sha('http://example.com', data="123")
+    SHA2 = get_request_sha('http://example.com', data="123")
+    SHA3 = get_request_sha('http://example.com', data=None)
+    SHA4 = get_request_sha('http://example1.com', data="123")
+    assert SHA1 == SHA2
+    assert SHA1 != SHA3
+    assert SHA2 != SHA3
+    assert SHA2 != SHA4
 
 
 

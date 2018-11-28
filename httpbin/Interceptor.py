@@ -9,9 +9,14 @@ from httpbin.helpers import (
 import time
 
 
-def get_request_sha():
-    url_byte = H(request.base_url.encode("utf-8"), algorithm='SHA-256')
-    data_byte = H(request.data, algorithm='SHA-256')
+def get_request_sha(url, data):
+    url_byte = H(url.encode("utf-8"), algorithm='SHA-256')
+    data_byte = H("data_content_abc123".encode("utf-8"), algorithm='SHA-256')
+    if isinstance(data, str):
+        data = data.encode("utf-8")
+    if data is not None:
+        data_byte = H(data, algorithm='SHA-256')
+
     md5 = H((url_byte.__add__(data_byte)).encode("utf-8"), algorithm='SHA-256')
     return md5
 
@@ -19,21 +24,19 @@ def get_request_sha():
 class TimeInterceptor:
     time_list = dict()
 
-    def end_intercept(self):
-        url = request.base_url
-        if url.endswith('timecost'):
+    def end_intercept(self, my_request):
+        if my_request.url.endswith('timecost'):
             return
-        md5 = get_request_sha()
+        md5 = get_request_sha(my_request.url, my_request.data)
         time_result = self.time_list[md5]
         time_result.end_ts = time.time()
         print(time_result.get_duration())
 
-    def start_intercept(self):
-        url = request.base_url
-        if url.endswith('timecost'):
+    def start_intercept(self, my_request):
+        if my_request.url.endswith('timecost'):
             return
-        md5 = get_request_sha()
-        time_result = TimeResult(start_ts=time.time(), url=url)
+        md5 = get_request_sha(my_request.url, my_request.data)
+        time_result = TimeResult(start_ts=time.time(), url=my_request.base_url)
         self.time_list[md5] = time_result
 
 
