@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <script type="text/javascript" src="./echarts.min.js"></script>
+</head>
+<body>
+    <div id="main" style="width: 600px;height:400px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: 'Response Time ECharts '
+            },
+            tooltip: {},
+            legend: {
+                data:['Time Cost']
+            },
+            xAxis: {
+                data: ["/undefined","/delete","/patch","/post"]
+            },
+            yAxis: {},
+            series: [{
+                name: 'Time Cost',
+                type: 'pie',
+                data: [0.000413, 0.0009248, 0.0006878, 0.0006680]
+            }]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+
+    </script>
+</body>
+</html>
